@@ -6,6 +6,7 @@ const {
   users,
 } = require('../app/lib/placeholder-data.js');
 const bcrypt = require('bcrypt');
+console.log(users);
 
 async function seedUsers(client) {
   try {
@@ -161,14 +162,19 @@ async function seedRevenue(client) {
 }
 
 async function main() {
-  const client = await db.connect();
+  try {
+    const client = await db.connect();
+    console.log(client, '===> db connection established');
+    await seedUsers(client);
+    await seedCustomers(client);
+    await seedInvoices(client);
+    await seedRevenue(client);
 
-  await seedUsers(client);
-  await seedCustomers(client);
-  await seedInvoices(client);
-  await seedRevenue(client);
-
-  await client.end();
+    await client.end();
+    console.log('Database connection closed successfully');
+  } catch (error) {
+    console.error('An error occurred while attempting to:', error);
+  }
 }
 
 main().catch((err) => {
